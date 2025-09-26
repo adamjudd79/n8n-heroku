@@ -54,9 +54,14 @@ else
   echo "REDIS_URL not set, queue mode may fail."
 fi
 
+# Debug: Show all arguments received
+echo "DEBUG: Script arguments: \$0='$0' \$1='$1' \$2='$2' \$#='$#'"
+echo "DEBUG: All arguments: $@"
+
 # Determine command based on process type or argument
 if [ -n "$1" ]; then
   CMD="$1"
+  echo "Command received: '$CMD'"
 else
   # Default to 'start' for web dyno if no argument
   CMD="start"
