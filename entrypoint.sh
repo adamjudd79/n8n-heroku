@@ -37,8 +37,16 @@ else
   echo "REDIS_URL not set, queue mode may fail."
 fi
 
-# Start n8n based on process type
-case "$1" in
+# Determine command based on process type or argument
+if [ -n "$1" ]; then
+  CMD="$1"
+else
+  # Default to 'start' for web dyno if no argument
+  CMD="start"
+  echo "No command specified, defaulting to 'start' for web process."
+fi
+
+case "$CMD" in
   start)
     echo "Starting n8n web process"
     n8n start
@@ -48,7 +56,7 @@ case "$1" in
     n8n worker
     ;;
   *)
-    echo "Unknown command. Use 'start' or 'worker'."
+    echo "Unknown command: '$CMD'. Use 'start' or 'worker'."
     exit 1
     ;;
 esac
