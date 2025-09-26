@@ -33,13 +33,23 @@ if [ -n "${REDIS_URL+x}" ]; then
   echo "Redis URL found: $REDIS_URL"
   echo "Queue Bull Redis URL: ${QUEUE_BULL_REDIS_URL:-$REDIS_URL}"
   
-  # Only set minimal additional Redis configuration if not already set
-  # Let n8n use the existing config vars (N8N_REDIS_SSL, etc.)
-  if [ -z "${QUEUE_BULL_REDIS_TLS+x}" ]; then
-    export QUEUE_BULL_REDIS_TLS="true"
-  fi
+  # Critical ioredis SSL configuration for Heroku Redis
+  export QUEUE_BULL_REDIS_TLS="true"
+  export QUEUE_BULL_REDIS_TLS_REJECT_UNAUTHORIZED="false"
   
-  echo "Redis configuration complete - using existing config vars"
+  # Additional ioredis-specific SSL settings
+  export QUEUE_BULL_REDIS_TLS_CHECK_SERVER_IDENTITY="false"
+  export QUEUE_BULL_REDIS_TLS_SERVERNAME=""
+  export QUEUE_BULL_REDIS_TLS_CA=""
+  export QUEUE_BULL_REDIS_TLS_CERT=""
+  export QUEUE_BULL_REDIS_TLS_KEY=""
+  
+  # Connection timeout settings
+  export QUEUE_BULL_REDIS_CONNECT_TIMEOUT="30000"
+  export QUEUE_BULL_REDIS_COMMAND_TIMEOUT="30000"
+  export QUEUE_BULL_REDIS_LAZY_CONNECT="true"
+  
+  echo "Redis SSL configuration applied for ioredis compatibility"
 else
   echo "REDIS_URL not set, queue mode may fail."
 fi
