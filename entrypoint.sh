@@ -37,6 +37,7 @@ if [ -n "${REDIS_URL+x}" ]; then
   fi
   
   # Set comprehensive Redis SSL/TLS configuration for Heroku Redis
+  export QUEUE_BULL_REDIS_TLS="true"
   export QUEUE_BULL_REDIS_TLS_REJECT_UNAUTHORIZED="${QUEUE_BULL_REDIS_TLS_REJECT_UNAUTHORIZED:-false}"
   export QUEUE_BULL_REDIS_TLS_SERVERNAME=""
   export QUEUE_BULL_REDIS_TLS_CA=""
@@ -44,6 +45,12 @@ if [ -n "${REDIS_URL+x}" ]; then
   export QUEUE_BULL_REDIS_COMMAND_TIMEOUT="60000"
   export QUEUE_BULL_REDIS_RETRY_DELAY_ON_FAILURE="5000"
   export QUEUE_BULL_REDIS_MAX_RETRIES_PER_REQUEST="3"
+  
+  # Additional Bull queue specific settings
+  export QUEUE_BULL_REDIS_FAMILY="4"
+  export QUEUE_BULL_REDIS_KEEP_ALIVE="30000"
+  export QUEUE_BULL_REDIS_LAZY_CONNECT="true"
+  export QUEUE_BULL_REDIS_MAX_RETRIES_PER_REQUEST="null"
   
   # Additional n8n Redis configuration
   export N8N_REDIS_HOST="$(echo $REDIS_URL | sed -e 's/.*@\([^:]*\):.*/\1/')"
