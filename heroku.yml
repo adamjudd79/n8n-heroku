@@ -8,5 +8,13 @@ build:
     web: Dockerfile
 
 run:
-  web: /entrypoint.sh start
-  worker: /entrypoint.sh worker
+  web:
+    command:
+      - /entrypoint.sh
+      - start
+    image: web
+  worker:
+    command:
+      - /entrypoint.sh
+      - worker
+    image: web
