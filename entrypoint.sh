@@ -32,6 +32,8 @@ export DB_POSTGRESDB_PASSWORD=$N8N_DB_PASSWORD
 if [ -n "${REDIS_URL+x}" ]; then
   PREFIX="N8N_REDIS_" parse_url "$REDIS_URL"
   export QUEUE_BULL_REDIS_URL="$REDIS_URL"
+  # Set Redis SSL/TLS configuration for queue mode
+  export QUEUE_BULL_REDIS_TLS_REJECT_UNAUTHORIZED="${N8N_REDIS_TLS_REJECT_UNAUTHORIZED:-false}"
   echo "Redis configured at $REDIS_URL"
 else
   echo "REDIS_URL not set, queue mode may fail."
