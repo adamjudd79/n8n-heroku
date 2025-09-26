@@ -1,2 +1,2 @@
-web: ./entrypoint.sh start
-worker: ./entrypoint.sh worker
+web: /entrypoint.sh start
+worker: /entrypoint.sh worker
