@@ -35,8 +35,25 @@ if [ -n "${REDIS_URL+x}" ]; then
   if [ -z "${QUEUE_BULL_REDIS_URL+x}" ]; then
     export QUEUE_BULL_REDIS_URL="$REDIS_URL"
   fi
+  
+  # Set comprehensive Redis SSL/TLS configuration for Heroku Redis
+  export QUEUE_BULL_REDIS_TLS_REJECT_UNAUTHORIZED="${QUEUE_BULL_REDIS_TLS_REJECT_UNAUTHORIZED:-false}"
+  export QUEUE_BULL_REDIS_TLS_SERVERNAME=""
+  export QUEUE_BULL_REDIS_TLS_CA=""
+  export QUEUE_BULL_REDIS_CONNECT_TIMEOUT="60000"
+  export QUEUE_BULL_REDIS_COMMAND_TIMEOUT="60000"
+  export QUEUE_BULL_REDIS_RETRY_DELAY_ON_FAILURE="5000"
+  export QUEUE_BULL_REDIS_MAX_RETRIES_PER_REQUEST="3"
+  
+  # Additional n8n Redis configuration
+  export N8N_REDIS_HOST="$(echo $REDIS_URL | sed -e 's/.*@\([^:]*\):.*/\1/')"
+  export N8N_REDIS_PORT="$(echo $REDIS_URL | sed -e 's/.*:\([0-9]*\)$/\1/')"
+  export N8N_REDIS_PASSWORD="$(echo $REDIS_URL | sed -e 's/.*:\/\/:\([^@]*\)@.*/\1/')"
+  export N8N_REDIS_DB="${QUEUE_BULL_REDIS_DB:-0}"
+  
   echo "Redis configured at $REDIS_URL"
   echo "Queue Bull Redis URL: $QUEUE_BULL_REDIS_URL"
+  echo "Redis SSL reject unauthorized: $QUEUE_BULL_REDIS_TLS_REJECT_UNAUTHORIZED"
 else
   echo "REDIS_URL not set, queue mode may fail."
 fi
