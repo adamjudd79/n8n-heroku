@@ -9,12 +9,10 @@ build:
 
 run:
   web:
-    command:
-      - /entrypoint.sh
-      - start
+    command: ["/entrypoint.sh"]
     image: web
   worker:
-    command:
-      - /entrypoint.sh
-      - worker
+    command: ["/entrypoint.sh"]
     image: web
+    config:
+      DYNO_TYPE: worker

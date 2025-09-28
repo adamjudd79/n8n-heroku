@@ -54,16 +54,24 @@ else
   echo "REDIS_URL not set, queue mode may fail."
 fi
 
-# Debug: Show all arguments received
+# Debug: Show all arguments and environment
 echo "DEBUG: Script arguments: \$0='$0' \$1='$1' \$2='$2' \$#='$#'"
 echo "DEBUG: All arguments: $@"
+echo "DEBUG: DYNO_TYPE='$DYNO_TYPE'"
+echo "DEBUG: DYNO='$DYNO'"
 
-# Determine command based on process type or argument
+# Determine command based on environment variables or arguments
 if [ -n "$1" ]; then
   CMD="$1"
-  echo "Command received: '$CMD'"
+  echo "Command received from argument: '$CMD'"
+elif [ "$DYNO_TYPE" = "worker" ]; then
+  CMD="worker"
+  echo "Command determined from DYNO_TYPE: '$CMD'"
+elif echo "$DYNO" | grep -q "worker"; then
+  CMD="worker"
+  echo "Command determined from DYNO name: '$CMD'"
 else
-  # Default to 'start' for web dyno if no argument
+  # Default to 'start' for web dyno
   CMD="start"
   echo "No command specified, defaulting to 'start' for web process."
 fi
