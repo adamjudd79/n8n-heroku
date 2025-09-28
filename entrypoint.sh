@@ -32,9 +32,21 @@ export DB_POSTGRESDB_PASSWORD=$N8N_DB_PASSWORD
 if [ -n "${REDIS_URL+x}" ]; then
   echo "Redis URL found: $REDIS_URL"
   
-  # Set the primary Redis URL for n8n queue
+  # Parse Redis URL to extract host and port (required by n8n)
+  PREFIX="REDIS_" parse_url "$REDIS_URL"
+  REDIS_HOST="$(echo $REDIS_HOSTPORT | sed -e 's,:.*,,g')"
+  REDIS_PORT="$(echo $REDIS_HOSTPORT | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
+  
+  # Set Redis connection variables (n8n expects these specific variables)
+  export QUEUE_BULL_REDIS_HOST="$REDIS_HOST"
+  export QUEUE_BULL_REDIS_PORT="$REDIS_PORT"
+  export QUEUE_BULL_REDIS_PASSWORD="$REDIS_PASSWORD"
   export QUEUE_BULL_REDIS_URL="${REDIS_URL}"
-  echo "Queue Bull Redis URL: ${QUEUE_BULL_REDIS_URL}"
+  
+  echo "Parsed Redis connection:"
+  echo "  Host: $REDIS_HOST"
+  echo "  Port: $REDIS_PORT"
+  echo "  Password: [REDACTED]"
   
   # Critical ioredis SSL configuration for Heroku Redis
   export QUEUE_BULL_REDIS_TLS="true"
@@ -62,6 +74,15 @@ if [ -n "${REDIS_URL+x}" ]; then
   # Ensure queue mode is enabled with proper Redis URL
   export EXECUTIONS_MODE="queue"
   export QUEUE_BULL_REDIS_URL="${REDIS_URL}"
+  
+  # Additional debugging and connection settings
+  echo "DEBUG: Final Redis configuration:"
+  echo "  REDIS_URL: ${REDIS_URL}"
+  echo "  QUEUE_BULL_REDIS_HOST: ${QUEUE_BULL_REDIS_HOST}"
+  echo "  QUEUE_BULL_REDIS_PORT: ${QUEUE_BULL_REDIS_PORT}"
+  echo "  QUEUE_BULL_REDIS_URL: ${QUEUE_BULL_REDIS_URL}"
+  echo "  N8N_REDIS_URL: ${N8N_REDIS_URL}"
+  echo "  EXECUTIONS_MODE: ${EXECUTIONS_MODE}"
   
   echo "Redis SSL configuration applied for ioredis compatibility"
 else
