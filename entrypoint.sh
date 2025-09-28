@@ -31,23 +31,37 @@ export DB_POSTGRESDB_PASSWORD=$N8N_DB_PASSWORD
 # Configure Redis for queue mode
 if [ -n "${REDIS_URL+x}" ]; then
   echo "Redis URL found: $REDIS_URL"
-  echo "Queue Bull Redis URL: ${QUEUE_BULL_REDIS_URL:-$REDIS_URL}"
+  
+  # Set the primary Redis URL for n8n queue
+  export QUEUE_BULL_REDIS_URL="${REDIS_URL}"
+  echo "Queue Bull Redis URL: ${QUEUE_BULL_REDIS_URL}"
   
   # Critical ioredis SSL configuration for Heroku Redis
   export QUEUE_BULL_REDIS_TLS="true"
   export QUEUE_BULL_REDIS_TLS_REJECT_UNAUTHORIZED="false"
   
-  # Additional ioredis-specific SSL settings
+  # Additional ioredis-specific SSL settings for Docker compatibility
   export QUEUE_BULL_REDIS_TLS_CHECK_SERVER_IDENTITY="false"
   export QUEUE_BULL_REDIS_TLS_SERVERNAME=""
   export QUEUE_BULL_REDIS_TLS_CA=""
   export QUEUE_BULL_REDIS_TLS_CERT=""
   export QUEUE_BULL_REDIS_TLS_KEY=""
   
-  # Connection timeout settings
-  export QUEUE_BULL_REDIS_CONNECT_TIMEOUT="30000"
-  export QUEUE_BULL_REDIS_COMMAND_TIMEOUT="30000"
+  # Heroku-recommended ioredis configuration for n8n
+  export QUEUE_BULL_REDIS_CONNECT_TIMEOUT="60000"
+  export QUEUE_BULL_REDIS_COMMAND_TIMEOUT="60000"
   export QUEUE_BULL_REDIS_LAZY_CONNECT="true"
+  export QUEUE_BULL_REDIS_MAX_RETRIES_PER_REQUEST="3"
+  export QUEUE_BULL_REDIS_RETRY_DELAY_ON_FAILURE="2000"
+  
+  # Core n8n Redis configuration following Heroku best practices
+  export N8N_REDIS_URL="${REDIS_URL}"
+  export N8N_REDIS_SSL="true"
+  export N8N_REDIS_TLS_REJECT_UNAUTHORIZED="false"
+  
+  # Ensure queue mode is enabled with proper Redis URL
+  export EXECUTIONS_MODE="queue"
+  export QUEUE_BULL_REDIS_URL="${REDIS_URL}"
   
   echo "Redis SSL configuration applied for ioredis compatibility"
 else
