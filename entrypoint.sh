@@ -95,16 +95,19 @@ echo "DEBUG: All arguments: $@"
 echo "DEBUG: DYNO_TYPE='$DYNO_TYPE'"
 echo "DEBUG: DYNO='$DYNO'"
 
-# Determine command based on environment variables or arguments
-if [ -n "$1" ]; then
-  CMD="$1"
-  echo "Command received from argument: '$CMD'"
+# Determine command based on DYNO environment variable (most reliable on Heroku)
+if echo "$DYNO" | grep -q "worker"; then
+  CMD="worker"
+  echo "Command determined from DYNO name: '$CMD' (DYNO=$DYNO)"
+elif echo "$DYNO" | grep -q "web"; then
+  CMD="start"
+  echo "Command determined from DYNO name: '$CMD' (DYNO=$DYNO)"
 elif [ "$DYNO_TYPE" = "worker" ]; then
   CMD="worker"
   echo "Command determined from DYNO_TYPE: '$CMD'"
-elif echo "$DYNO" | grep -q "worker"; then
-  CMD="worker"
-  echo "Command determined from DYNO name: '$CMD'"
+elif [ -n "$1" ] && [ "$1" != "/bin/sh" ] && [ "$1" != "-c" ]; then
+  CMD="$1"
+  echo "Command received from argument: '$CMD'"
 else
   # Default to 'start' for web dyno
   CMD="start"
