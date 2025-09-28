@@ -59,6 +59,10 @@ if [ -n "${REDIS_URL+x}" ]; then
   export QUEUE_BULL_REDIS_TLS_CERT=""
   export QUEUE_BULL_REDIS_TLS_KEY=""
   
+  # Additional SSL bypass settings for self-signed certificates
+  export QUEUE_BULL_REDIS_TLS_VERIFY_MODE="none"
+  export QUEUE_BULL_REDIS_SSL_VERIFY_MODE="none"
+  
   # Heroku-recommended ioredis configuration for n8n
   export QUEUE_BULL_REDIS_CONNECT_TIMEOUT="60000"
   export QUEUE_BULL_REDIS_COMMAND_TIMEOUT="60000"
@@ -70,6 +74,13 @@ if [ -n "${REDIS_URL+x}" ]; then
   export N8N_REDIS_URL="${REDIS_URL}"
   export N8N_REDIS_SSL="true"
   export N8N_REDIS_TLS_REJECT_UNAUTHORIZED="false"
+  
+  # Additional n8n Redis SSL bypass settings
+  export N8N_REDIS_TLS_CHECK_SERVER_IDENTITY="false"
+  export N8N_REDIS_SSL_VERIFY_MODE="none"
+  
+  # Node.js SSL bypass for self-signed certificates
+  export NODE_TLS_REJECT_UNAUTHORIZED="0"
   
   # Ensure queue mode is enabled with proper Redis URL
   export EXECUTIONS_MODE="queue"
