@@ -86,6 +86,10 @@ if [ -n "${REDIS_URL+x}" ]; then
   export EXECUTIONS_MODE="queue"
   export QUEUE_BULL_REDIS_URL="${REDIS_URL}"
   
+  # Set worker concurrency (default is 10 per worker)
+  export N8N_CONCURRENCY="${N8N_CONCURRENCY:-20}"
+  export QUEUE_BULL_REDIS_CONCURRENCY="${QUEUE_BULL_REDIS_CONCURRENCY:-20}"
+  
   # Additional debugging and connection settings
   echo "DEBUG: Final Redis configuration:"
   echo "  REDIS_URL: ${REDIS_URL}"
@@ -94,6 +98,8 @@ if [ -n "${REDIS_URL+x}" ]; then
   echo "  QUEUE_BULL_REDIS_URL: ${QUEUE_BULL_REDIS_URL}"
   echo "  N8N_REDIS_URL: ${N8N_REDIS_URL}"
   echo "  EXECUTIONS_MODE: ${EXECUTIONS_MODE}"
+  echo "  N8N_CONCURRENCY: ${N8N_CONCURRENCY}"
+  echo "  QUEUE_BULL_REDIS_CONCURRENCY: ${QUEUE_BULL_REDIS_CONCURRENCY}"
   
   echo "Redis SSL configuration applied for ioredis compatibility"
 else
@@ -131,8 +137,8 @@ case "$CMD" in
     n8n start
     ;;
   worker)
-    echo "Starting n8n worker process"
-    n8n worker
+    echo "Starting n8n worker process with concurrency: ${N8N_CONCURRENCY:-10}"
+    n8n worker --concurrency=${N8N_CONCURRENCY:-20}
     ;;
   *)
     echo "Unknown command: '$CMD'. Use 'start' or 'worker'."
